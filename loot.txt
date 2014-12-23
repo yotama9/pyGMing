@@ -1,0 +1,4 @@
+healing potino 2d8+3, 10, ,dragon
+GP, 500, ,dragon
+head band of minor ilusion, 1, ,
+SP, 500, hill;dragon,

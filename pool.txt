@@ -1,0 +1,3 @@
+Hill = 48 90 1
+Dragon = 12 50 0
+Stone = 8 25 0
