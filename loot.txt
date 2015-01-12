@@ -1,3 +1,0 @@
-healing potino 2d8+3, 10, ,dragon
-GP, 590, ,dragon
-SP, 580, hill;dragon,
