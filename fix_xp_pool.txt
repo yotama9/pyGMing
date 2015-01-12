@@ -1,0 +1,4 @@
+encounter 50
+orc1 10
+orc2 25
+orc3 50

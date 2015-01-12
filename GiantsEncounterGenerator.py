@@ -24,17 +24,17 @@ class Amonster:
     # approperiate line at the file. I guess that eventually I'll do that
     def __init__(self,kind,loot):
         self.kind = kind
-        print '\033[1m' 
-        print kind + '\033[0m' # Print the name of the monster in bold face
-        print 'page: '+self.page()
-        print 'HP: ' + self.hp_roller()
-        print 'Init: ' + self.init_roller()
+        print ('\033[1m') 
+        print (kind + '\033[0m') # Print the name of the monster in bold face
+        print ('page: '+self.page())
+        print ('HP: ' + self.hp_roller())
+        print ('Init: ' + self.init_roller())
         #print the loot
-        print '\x1B[3m*Loot\x1B[23m'
+        print ('\x1B[3m*Loot\x1B[23m')
         for l in loot:
             n = loot[l]
             if n == 0: continue
-            print '{l}: {n}'.format(l=l,n=loot[l])
+            print ('{l}: {n}'.format(l=l,n=loot[l]))
     
     def page (self): #The page in the monster manual
         if self.kind == 'hill':
@@ -164,7 +164,7 @@ def RP_Calc(Pin):
     #function
     tp = sum([Pin[p][0]*Pin[p][1] for p in Pin])
     if tp == 0:
-        print "All the monsters are dead now\n go home"
+        print ("All the monsters are dead now\n go home")
         exit()
         
     for name in P: #This is the actualy probabilities calculation
@@ -230,10 +230,10 @@ while True: #Generate the encoutner
 
     p = random() # A new random number, determine if this is a "special" monster
     if P[monster][2]*1.0/P[monster][0] > p:
-        print 'Unique' #Again, the DM is responsible on changing the pool file
+        print ('Unique') #Again, the DM is responsible on changing the pool file
 
     p = random()# Generate new ranomd number
     if p < fprob(xpval*multi): #Exit the loop
-        print 'Encounter XP: ' + str(xpval)
-        print 'Diffculty XP: ' + str(xpval*multi)
+        print ('Encounter XP: ' + str(xpval))
+        print ('Diffculty XP: ' + str(xpval*multi))
         break

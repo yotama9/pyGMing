@@ -107,7 +107,7 @@ def xp_hardness_calc(PC_level):
             hard += 8500*n
             deadly += 12700*n
         else:
-            print 'invalid players list'
+            print ('invalid players list')
             easy = 0
             medium = 0
             hard = 0
