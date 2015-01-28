@@ -1,0 +1,8 @@
+<html><h1>Welcome</h1>
+Welcome to pyGM. Not much is done yet, Command index will be
+available.<br>
+For now, type <b>add</b> to add an creature to the initiative order, and
+<b>step</b> to advance in initiative. Typing help following command name will
+give more information.
+
+</html>

@@ -1,0 +1,10 @@
+<html>
+<h1>The <i>step</i> command</h1>
+The <i>step</i> command is used to advance the initative order to the next
+creature. As one would expect, at the end of the round. The initiative order appears
+as a list at the right hand of the program, and the current round is markerd by
+a darken area.
+
+
+
+</html>

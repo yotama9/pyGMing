@@ -1,0 +1,30 @@
+<html><h1>The <i>add</i> command</h1>
+The <i>add</i> command is used to append creature to the init list. Simpy typing
+<i>add</i> will initiate a dialog that will ask for creature name, and
+initiative. You can use <i>add</i> with arguments as int the folowing examples. <br><br>
+
+<i> add </i><br><br>
+
+will initiate the dialog where the user will be asked for name and initative.<br><br>
+
+
+<i> add name goblin </i><br><br>
+
+
+will introduce a goblin and will ask the user for initiative.<br><br>
+
+
+<i> add init 10</i><br><br>
+
+
+will introduce a creature at the init round 10, the user will be asked for
+name.<br><br>
+
+
+<i> add name Robert init 1</i><br><br>
+
+will create a new initiative entry at round 1 named Robert
+
+
+
+</html>
