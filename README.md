@@ -13,7 +13,7 @@ The scrits are written with two things in mind, stochasticity, and ease of game.
 
 When should I use this?
 =======
-During the session, when you wish to create a random encounter. 
+During the session, when you need one of their capabilities
 
 How do I install and use this?
 =======
