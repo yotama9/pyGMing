@@ -22,18 +22,21 @@ class pyGM(QtGui.QWidget):
             self.test()
 
     def text (self):
+        return
         #nothing to test for now, will have to later, probably
 
     def set_const(self):
         self.EXECUTE = 1
         self.READNAME = 2
         self.READINIT = 3
+        self.READHP = 4
         self.condition = self.EXECUTE
         return
 
     def set_flags(self):
         self.creatureName = None
         self.creatureInit = None
+        self.creatureHP = None
         self.commandHist = []
         return
 
@@ -145,8 +148,8 @@ class pyGM(QtGui.QWidget):
     def pop_ui_box(self):
         #Create the interface section
         h_box = QtGui.QHBoxLayout()
-        self.msg_label = QtGui.QLabel('Messages:',self)
-        self.msg_line = QtGui.QLabel('',self) #the user message label
+        self.msg_label = QtGui.QLabel('Now Reading:',self)
+        self.msg_line = QtGui.QLabel('commands',self) #the user message label
         self.input_line = QtGui.QLineEdit('',self) #The command line
         self.input_line.returnPressed.connect(self.executeCommand)
         h_box.addWidget(self.msg_label)
@@ -173,10 +176,14 @@ class pyGM(QtGui.QWidget):
         for i in range(0,len(args),2):
             if args[i].compare('name',False) == 0: self.creatureName = args[i+1]
             if args[i].compare('init',False) == 0: self.creatureInit = args[i+1]
+            if args[i].compare('hp',False) == 0:self.creatureHP = args[i+1]
 
 
         self.creatureInit = number_confirmer(val=self.creatureInit,minv=0)
-        self.main_text.setText(make_creautre_summery(self.creatureName,self.creatureInit))
+        self.creatureHP = number_confirmer(val=self.creatureHP,minv=0)
+        self.main_text.setText(make_creautre_summery(self.creatureName,
+                                                     self.creatureInit,
+                                                     self.creatureHP))
 
         
 
@@ -193,21 +200,34 @@ class pyGM(QtGui.QWidget):
             self.condition = self.READINIT
             return
 
+        if self.creatureHP == None:
+            # read creature hp value
+            self.msg_line.setText('Creature HP')
+            self.condition = self.READHP
+            return
+
+
 
         #Add to the init label, we need to rearange the labels
         
         for ilabel in self.init_labels:
             if ilabel.init_round == -1: 
                 #Reached the end of the init list, append
-                ilabel.setInitText(self.creatureName,self.creatureInit)
+                ilabel.setInitText(self.creatureName,
+                                   self.creatureInit,
+                                   self.creatureHP)
                 break
             if ilabel.init_round < self.creatureInit:
                 #Found somebody that acts later, switch
                 nname = ilabel.name
                 ninit = ilabel.init_round
-                ilabel.setInitText(self.creatureName,self.creatureInit)
+                nhp = ilabel.hp
+                ilabel.setInitText(self.creatureName,
+                                   self.creatureInit,
+                                   self.creatureHP)
                 self.creatureName = nname
                 self.creatureInit = ninit
+                self.creatureHP = nhp
 
                 self.addInit()
                 break
@@ -220,12 +240,16 @@ class pyGM(QtGui.QWidget):
             self.init_labels[0].setStyleSheet(self.cur_init_color)
 
 
+        self.resetCondition()
+
+    def resetCondition(self):
         #Reset the conditions. Any condition should be set before here
         self.condition = self.EXECUTE
-        self.msg_line.setText('')
+        self.msg_line.setText('commands')
         self.main_text.setText(open('share/welcome.txt').read())
         self.creatureName = None
         self.creatureInit = None
+        self.creatureHP = None
         return
         
 
@@ -253,8 +277,18 @@ class pyGM(QtGui.QWidget):
             #update the history list
             if i >= len(self.commandHist): break
             command = self.commandHist[-i-1]
+            if len(command) > 10:
+                command = command[:10] + '...'
             line = '{}.{}'.format(i+1,command)
             self.hist_labels[i].setText(line)
+
+    def hit(self,args=[]):
+        return
+        #not implemented yet
+
+        
+        
+
 
 
 
@@ -279,6 +313,10 @@ class pyGM(QtGui.QWidget):
             self.condition = self.EXECUTE
             self.addInit([QtCore.QString('init'),command])
             return
+        if self.condition == self.READHP:
+            self.condition = self.EXECUTE
+            self.addInit([QtCore.QString('hp'),command])
+            return
 
         if self.condition == self.EXECUTE: #Execute a command
             self.appendCommand(fullcommand)
@@ -289,6 +327,12 @@ class pyGM(QtGui.QWidget):
                 self.msg_line.setText('Adding to inittiative order')
                 self.addInit(args)
                 return
+            if comand.tolower() == 'hit': #hit somebody, and deal damage
+                self.msg_line.setText('Dealing damage')
+                self.hit(args)
+                return
+
+            
             if command.toLower() == 'help': #Type help
                 self.dmhelp(args)
             if command.toLower() == 'exit': #exit
@@ -297,7 +341,7 @@ class pyGM(QtGui.QWidget):
 
 
     def exit(self):
-        #Exit the program, for now, now confirmation
+        #Exit the program, for now, no confirmation
         QtGui.QApplication.quit()
 
 

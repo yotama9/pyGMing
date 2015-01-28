@@ -1,8 +1,18 @@
 <html><h1>Welcome</h1>
-Welcome to pyGM. Not much is done yet, Command index will be
-available.<br>
-For now, type <b>add</b> to add an creature to the initiative order, and
-<b>step</b> to advance in initiative. Typing help following command name will
-give more information.
+Welcome to pyGM. Not much is done yet. At the bottom, you can see the command
+line, which you'll use to interaction with. Above to it, is the condition
+marker. To the right, at the top, you can find the (empty) initiative order.
+Once you'll add a creature to it, it will have the format of <i><tt>i.name(HP)</tt></i>
+with <i>i</i> marking the initiative order, <i>name</i> the creature name, and
+<i>hp</i> the hp of that creature. For example
+
+<p><tt>5.goblin(13)</tt>,</p>
+
+notes a goblin with 13 hp that has an initiative score of 5.
+<p>
+Command index will be available later, for now, type <b>add</b> to add an
+creature to the initiative order, and <b>step</b> to advance in initiative.
+Typing help following command name will give more information.
+</p>
 
 </html>
