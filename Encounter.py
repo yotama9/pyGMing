@@ -21,7 +21,11 @@ class pyGM(QtGui.QWidget):
         if len(argv) > 1 and 'test' in argv:
             self.test()
 
-    def text (self):
+    def test (self):
+        args = ['name','horse','init',12,'hp',15]
+        self.addInit(args)
+        args = ['name','goblin','init',14,'hp',35]
+        self.addInit(args)
         return
         #nothing to test for now, will have to later, probably
 
@@ -30,6 +34,8 @@ class pyGM(QtGui.QWidget):
         self.READNAME = 2
         self.READINIT = 3
         self.READHP = 4
+        self.READ_HP_TARGET = 5
+        self.READ_HP_DELTA = 6
         self.condition = self.EXECUTE
         return
 
@@ -37,6 +43,10 @@ class pyGM(QtGui.QWidget):
         self.creatureName = None
         self.creatureInit = None
         self.creatureHP = None
+        self.hp_target = None
+        self.hp_delta = None
+        self.hp_change_sign = None
+        self.creatureCount = 0
         self.commandHist = []
         return
 
@@ -68,11 +78,11 @@ class pyGM(QtGui.QWidget):
         #populate the initative box
         self.init_labels = []
         self.cur_init = -1
-        for i in range (28,14,-1):
+        for i in range (40,20,-1):
             label = InitLabel()
             self.init_lbox.addWidget(label)
             self.init_labels.append(label)
-        for i in range (14,0,-1):
+        for i in range (20,0,-1):
             label = InitLabel()
             self.init_rbox.addWidget(label)
             self.init_labels.append(label)
@@ -88,7 +98,7 @@ class pyGM(QtGui.QWidget):
 
     def pop_main_box(self):
         #the main box, where information is displayed
-        self.main_label = QtGui.QLabel('Help')
+        self.main_label = QtGui.QLabel('Details')
         self.main_text = QtGui.QLabel()
         #Reading the welcome message from file
         self.main_text.setText(open('share/welcome.txt').read())
@@ -172,6 +182,9 @@ class pyGM(QtGui.QWidget):
 
 
     def addInit(self,args=[]):
+        #Convert args into str
+        for i in range (len(args)):
+            args[i] = QtCore.QString(str(args[i]))
         #Put the creautur summerty in the main display
         for i in range(0,len(args),2):
             if args[i].compare('name',False) == 0: self.creatureName = args[i+1]
@@ -179,13 +192,12 @@ class pyGM(QtGui.QWidget):
             if args[i].compare('hp',False) == 0:self.creatureHP = args[i+1]
 
 
+
         self.creatureInit = number_confirmer(val=self.creatureInit,minv=0)
         self.creatureHP = number_confirmer(val=self.creatureHP,minv=0)
         self.main_text.setText(make_creautre_summery(self.creatureName,
                                                      self.creatureInit,
                                                      self.creatureHP))
-
-        
 
         if self.creatureName == None:
             # read creaure name
@@ -216,6 +228,9 @@ class pyGM(QtGui.QWidget):
                 ilabel.setInitText(self.creatureName,
                                    self.creatureInit,
                                    self.creatureHP)
+                #Increase creature count. This will only be reached once
+
+                self.creatureCount += 1                 
                 break
             if ilabel.init_round < self.creatureInit:
                 #Found somebody that acts later, switch
@@ -241,15 +256,20 @@ class pyGM(QtGui.QWidget):
 
 
         self.resetCondition()
+        return
 
     def resetCondition(self):
         #Reset the conditions. Any condition should be set before here
+
         self.condition = self.EXECUTE
         self.msg_line.setText('commands')
         self.main_text.setText(open('share/welcome.txt').read())
         self.creatureName = None
         self.creatureInit = None
         self.creatureHP = None
+        self.hp_delta = None
+        self.hp_target = None
+        self.hp_change_sign = 0
         return
         
 
@@ -282,16 +302,57 @@ class pyGM(QtGui.QWidget):
             line = '{}.{}'.format(i+1,command)
             self.hist_labels[i].setText(line)
 
-    def hit(self,args=[]):
+    def change_hp(self,args=[]):
+        if self.creatureCount == 0:
+            #No creature, can't change hp
+            self.resetCondition()
+            return
+
+        #Convert args into str
+
+        #Single creature, only one tareget. 
+        #Unless something is messy in the args, it will be chosen
+        if self.creatureCount == 1: self.hp_target = 0
+
+        for i in range (len(args)):
+            args[i] = QtCore.QString(str(args[i]))
+
+        for i in range (0,len(args),2):
+            #The false is for case sensetive
+            if args[i].compare('target',False) == 0: self.hp_target = args[i+1]
+            if args[i].compare('delta',False) == 0: self.hp_delta = args[i+1]
+
+        self.hp_target = number_confirmer(val=self.hp_target,
+                                          minv=0,
+                                          maxv=self.creatureCount)
+        self.hp_delta = number_confirmer(val=self.hp_delta,minv=0)
+
+
+
+        if not self.hp_target:
+            #excetued if no creature is selected, or invalid target
+            #list creatures
+            self.main_text.setText(list_init_round(self.init_labels))
+            self.condition = self.READ_HP_TARGET
+            self.msg_line.setText('Target of attack')
+            return
+
+        if not self.hp_delta:
+            #ask for change in hp
+            self.condition = self.READ_HP_DELTA
+            self.msg_line.setText('Damage')
+            return
+
+        #No changes after this point
+        self.hp_delta *= self.hp_change_sign
+        self.init_labels[self.hp_target-1].change_hp(self.hp_delta)
+        
+        self.resetCondition()
+
+        
         return
         #not implemented yet
-
         
-        
-
-
-
-
         
     def executeCommand(self):
         fullcommand = self.input_line.text() #Get the command
@@ -307,15 +368,23 @@ class pyGM(QtGui.QWidget):
         self.input_line.setText('') #Clear the command line
         if self.condition == self.READNAME:
             self.condition = self.EXECUTE
-            self.addInit([QtCore.QString('name'),command])
+            self.addInit(['name',command])
             return
         if self.condition == self.READINIT:
             self.condition = self.EXECUTE
-            self.addInit([QtCore.QString('init'),command])
+            self.addInit(['init',command])
             return
         if self.condition == self.READHP:
             self.condition = self.EXECUTE
-            self.addInit([QtCore.QString('hp'),command])
+            self.addInit(['hp',command])
+            return
+        if self.condition == self.READ_HP_TARGET:
+            self.condition = self.EXECUTE
+            self.change_hp(['target',command])
+            return
+        if self.condition == self.READ_HP_DELTA:
+            self.condition = self.EXECUTE
+            self.change_hp(['delta',command])
             return
 
         if self.condition == self.EXECUTE: #Execute a command
@@ -327,9 +396,16 @@ class pyGM(QtGui.QWidget):
                 self.msg_line.setText('Adding to inittiative order')
                 self.addInit(args)
                 return
-            if comand.tolower() == 'hit': #hit somebody, and deal damage
+            if command.toLower() == 'hit': #hit somebody, and deal damage
+                self.hp_change_sign = -1
                 self.msg_line.setText('Dealing damage')
-                self.hit(args)
+                self.change_hp(args)
+                return
+
+            if command.toLower() == 'heal': #heal damage
+                self.hp_change_sign = 1
+                self.msg_line.setText('Dealing damage')
+                self.change_hp(args)
                 return
 
             

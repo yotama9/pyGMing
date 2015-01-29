@@ -24,7 +24,22 @@ class InitLabel(QtGui.QLabel):
         self.name = name
         self.init_round = iround
         self.hp = hp
+        self.setMaxHP(self.hp)
         self.setText(text)
         return
+
+    def setMaxHP(self,hp):
+        self.maxHP = hp
+        return
+
+    def change_hp(self,delta):
+        try:
+            delta = int(delta)
+        except ValueError:
+            return
+
+        self.hp += delta
+        #Update the text
+        self.setText(make_init_text(self.name,self.init_round,self.hp))
 
     

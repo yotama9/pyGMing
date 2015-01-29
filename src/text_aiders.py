@@ -18,6 +18,7 @@ def make_creautre_summery(name=None,init=None,hp=None):
 
 
 def make_init_text(name=None,init=None,hp=None):
+    if hp == 0: hp = '0' #For the "not hp" test below
     if not init: #There has to be an initiative value
         return ''
     if not hp: #There has to be an hp value
@@ -34,3 +35,18 @@ def make_init_text(name=None,init=None,hp=None):
 
     return '{}. {} ({})'.format(init,name,hp)
     
+def list_init_round(init_labels=[]):
+    #This will produce a string of ordered list of creatures
+    out = '<html><h1>Choose target</h1>'
+    i = 1
+    for label in init_labels:
+        name = label.name
+        hp = label.hp
+        init = label.init_round
+        if init < 0:
+            continue
+        line = '<br>{}) {} - {} hit points'.format(i,name,hp)
+        out = '{}{}'.format(out,line)
+        i += 1
+    out = '{}</html>'.format(out)
+    return out
